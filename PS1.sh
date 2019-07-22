@@ -16,4 +16,21 @@ else
 fi
 unset color_prompt force_color_prompt
 
+in_git_repo() {
+    [ -d .git ] || git rev-parse --git-dir > /dev/null 2>&1
+}
+git_branch() {
+    local branch=$(git branch 2>/dev/null | grep -Po "(?<=\* ).+")
+    echo "$branch"
+}
+
+print_git_status() {
+    if in_git_repo; then
+        local status="\n$Tpipe$LineHoriz B:$(git_branch)"
+        echo -e "$status"
+    fi
+}
+
+PS1+='$(print_git_status)'
+
 PS1+='\n$BoxCornerLL\$ '
