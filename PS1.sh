@@ -23,10 +23,24 @@ git_branch() {
     local branch=$(git branch 2>/dev/null | grep -Po "(?<=\* ).+")
     echo "$branch"
 }
+git_index() {
+    local new=$(git status --porcelain | grep '^[AC][ MD]' | wc -l)
+    local modified=$(git status --porcelain | grep '^[MR][ MD]' | wc -l)
+    local deleted=$(git status --porcelain | grep '^D ' | wc -l)
+    echo "$Green+:$new $Delta:$modified $Minus:$deleted$NC"
+}
+git_worktree() {
+    local modified=$(git status --porcelain | grep '^[ MARC]M' | wc -l)
+    local deleted=$(git status --porcelain | grep '^[ MARC]D' | wc -l)
+    local untracked=$(git status --porcelain | grep '^??' | wc -l)
+    echo "$Red$Delta:$modified $Minus:$deleted ?:$untracked$NC"
+}
 
 print_git_status() {
     if in_git_repo; then
         local status="\n$Tpipe$LineHoriz B:$(git_branch)"
+        status+="    $(git_index)"
+        status+="    $(git_worktree)"
         echo -e "$status"
     fi
 }
