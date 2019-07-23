@@ -25,15 +25,15 @@ git_branch() {
     echo "$branch"
 }
 git_index() {
-    local new=$(git status --porcelain | grep '^[AC][ MD]' | wc -l)
-    local modified=$(git status --porcelain | grep '^[MR][ MD]' | wc -l)
-    local deleted=$(git status --porcelain | grep '^D ' | wc -l)
+    local new=$(git diff-index --cached --name-only --diff-filter=A HEAD | wc -l)
+    local modified=$(git diff-index --cached --name-only --diff-filter=M HEAD | wc -l)
+    local deleted=$(git diff-index --cached --name-only --diff-filter=D HEAD | wc -l)
     echo "$Green+:$new $Delta:$modified $Minus:$deleted$NC"
 }
 git_worktree() {
-    local modified=$(git status --porcelain | grep '^[ MARC]M' | wc -l)
-    local deleted=$(git status --porcelain | grep '^[ MARC]D' | wc -l)
-    local untracked=$(git status --porcelain | grep '^??' | wc -l)
+    local modified=$(git diff --name-only --diff-filter=M | wc -l)
+    local deleted=$(git diff --name-only --diff-filter=D | wc -l)
+    local untracked=$(git ls-files --exclude-standard --others | wc -l)
     echo "$Red$Delta:$modified $Minus:$deleted ?:$untracked$NC"
 }
 
